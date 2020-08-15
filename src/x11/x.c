@@ -447,8 +447,10 @@ static void x_handle_click(XEvent ev)
                         if (n) {
                                 if (act == MOUSE_CLOSE_CURRENT)
                                         queues_notification_close(n, REASON_USER);
-                                else
+                                else {
+                                        notification_run_close_script(n, act, REASON_USER);
                                         notification_do_action(n);
+                                }
                         }
                 }
         }

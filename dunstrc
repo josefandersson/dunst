@@ -351,6 +351,13 @@
 # The script will be called as follows:
 #   script appname summary body icon urgency
 # where urgency can be "LOW", "NORMAL" or "CRITICAL".
+# With the "close_script" option you may also specify a script to
+# run when the notification is closed.
+# The script is called as follows:
+#   script appname summary body icon urgency mouse_action reason
+# where urgency can be "LOW", "NORMAL" or "CRITICAL" and
+# where mouse_action can be "0"=NONE, "1"=DO_ACTION, "2"=CLOSE_CURRENT or "3"=CLOSE_ALL and
+# where reason can be "1"=TIME, "2"=USER, "3"=SIG or "4"=UNDEF.
 #
 # NOTE: if you don't want a notification to be displayed, set the format
 # to "".
@@ -388,6 +395,7 @@
 #[script-test]
 #    summary = "*script*"
 #    script = dunst_test.sh
+#    close_script = dunst_test.sh
 
 #[ignore]
 #    # This notification will not be displayed

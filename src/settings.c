@@ -777,6 +777,7 @@ void load_settings(char *cmdline_config_path)
                         g_free(c);
                 }
                 r->script = ini_get_path(cur_section, "script", NULL);
+                r->close_script = ini_get_path(cur_section, "close_script", NULL);
                 r->set_stack_tag = ini_get_string(cur_section, "set_stack_tag", r->set_stack_tag);
         }
 

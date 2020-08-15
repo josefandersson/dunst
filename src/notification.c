@@ -96,6 +96,13 @@ void notification_print(const struct notification *n)
                 }
                 printf("\n");
         }
+        printf("\tclose_script_count: %d\n", n->close_script_count);
+        if (n->close_script_count > 0) {
+                printf("\tclose_scripts: ");
+                for (int i = 0; i < n->close_script_count; i++)
+                        printf("'%s' ",n->close_scripts[i]);
+                printf("\n");
+        }
         printf("}\n");
 }
 
@@ -138,6 +145,62 @@ void notification_run_script(struct notification *n)
                                                 body,
                                                 icon,
                                                 urgency,
+                                                (char *)NULL);
+                                if (ret != 0) {
+                                        LOG_W("Unable to run script: %s", strerror(errno));
+                                        exit(EXIT_FAILURE);
+                                }
+                        }
+                }
+        }
+}
+
+/* see notification.h */
+void notification_run_close_script(struct notification *n, const int mouse_action, const int reason)
+{
+        if (n->close_script_run)
+                return;
+
+        n->close_script_run = true;
+
+        const char *appname = n->appname ? n->appname : "";
+        const char *summary = n->summary ? n->summary : "";
+        const char *body = n->body ? n->body : "";
+        const char *icon = n->iconname ? n->iconname : "";
+
+        const char *urgency = notification_urgency_to_string(n->urgency);
+        
+        char cmouse_action[2];
+        sprintf(cmouse_action, "%d", mouse_action);
+        char creason[2];
+        sprintf(creason, "%d", reason);
+
+        for(int i = 0; i < n->close_script_count; i++) {
+
+                const char *script = n->close_scripts[i];
+
+                if (STR_EMPTY(script))
+                        continue;
+
+                int pid1 = fork();
+
+                if (pid1) {
+                        int status;
+                        waitpid(pid1, &status, 0);
+                } else {
+                        int pid2 = fork();
+                        if (pid2) {
+                                exit(0);
+                        } else {
+                                int ret = execlp(script,
+                                                script,
+                                                appname,
+                                                summary,
+                                                body,
+                                                icon,
+                                                urgency,
+                                                cmouse_action,
+                                                creason,
                                                 (char *)NULL);
                                 if (ret != 0) {
                                         LOG_W("Unable to run script: %s", strerror(errno));
@@ -248,9 +311,10 @@ void notification_unref(struct notification *n)
 
         notification_private_free(n->priv);
 
-        if (n->script_count > 0){
+        if (n->script_count > 0)
                 g_free(n->scripts);
-        }
+        if (n->close_script_count > 0)
+                g_free(n->close_scripts);
 
         g_free(n);
 }
@@ -334,6 +398,7 @@ struct notification *notification_create(void)
         n->progress = -1;
 
         n->script_run = false;
+        n->close_script_run = false;
         n->dbus_valid = false;
 
         n->fullscreen = FS_SHOW;
@@ -341,6 +406,7 @@ struct notification *notification_create(void)
         n->actions = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 
         n->script_count = 0;
+        n->close_script_count = 0;
         return n;
 }
 

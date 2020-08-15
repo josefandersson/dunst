@@ -315,6 +315,7 @@ void queues_notification_close_id(int id, enum reason reason)
                      iter = iter->next) {
                         struct notification *n = iter->data;
                         if (n->id == id) {
+                                notification_run_close_script(n, MOUSE_NONE, reason);
                                 g_queue_remove(allqueues[i], n);
                                 target = n;
                                 break;

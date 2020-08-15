@@ -34,6 +34,7 @@ struct rule {
         char *fc;
         const char *format;
         const char *script;
+        const char *close_script;
         enum behavior_fullscreen fullscreen;
         char *set_stack_tag;
 };

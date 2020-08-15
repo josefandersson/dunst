@@ -50,6 +50,12 @@ void rule_apply(struct rule *r, struct notification *n)
 
                 n->script_count++;
         }
+        if (r->close_script){
+                n->close_scripts = g_renew(const char*,n->close_scripts,n->close_script_count + 1);
+                n->close_scripts[n->close_script_count] = r->close_script;
+
+                n->close_script_count++;
+        }
         if (r->set_stack_tag) {
                 g_free(n->stack_tag);
                 n->stack_tag = g_strdup(r->set_stack_tag);

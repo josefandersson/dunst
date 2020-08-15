@@ -138,6 +138,7 @@ struct rule default_rules[] = {
                 .bg              = NULL,
                 .format          = NULL,
                 .script          = NULL,
+                .close_script    = NULL,
         }
 };
 
